@@ -8,10 +8,13 @@ public class PlayerController : MonoBehaviour
     public float speed = 0;
     public TextMeshProUGUI countText;
     public GameObject winText;
+    public GameObject loseText;
     private Rigidbody rb;
     private float movementX;
     private float movementY;
     private int count; 
+    private bool lost;
+    private bool won;
 
     // Start is called before the first frame update
     void Start(){
@@ -19,6 +22,9 @@ public class PlayerController : MonoBehaviour
         count = 0;
         setCountText();
         winText.SetActive(false);
+        loseText.SetActive(false);
+        lost = false;
+        won = false;
     }
 
     void OnMove(InputValue movementValue){
@@ -30,8 +36,9 @@ public class PlayerController : MonoBehaviour
 
     void setCountText(){
         countText.text = "Count: " + count.ToString();
-        if(count == 12){
+        if(count == 12 && !lost){
             winText.SetActive(true);
+            won = true;
         }
     }
     void FixedUpdate(){
@@ -40,10 +47,18 @@ public class PlayerController : MonoBehaviour
     }
 
     private void OnTriggerEnter(Collider other){
-        if(other.gameObject.CompareTag("PickUp")){
+        if(other.gameObject.CompareTag("PickUp") && !lost){
             other.gameObject.SetActive(false);
             count += 1;
             setCountText();
+        }
+        
+    }
+
+    private void OnCollisionEnter(Collision collision){
+        if(collision.gameObject.CompareTag("Wall") && !won){
+            loseText.SetActive(true);
+            lost = true;
         }
     }
 }
